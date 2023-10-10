@@ -20,6 +20,11 @@ jobs:
     name: Build and push image
     runs-on: ubuntu-20.04
 
+    strategy:
+      fail-fast: false
+      matrix:
+        major_version: [38, 39]
+
     steps:
     - uses: actions/checkout@v2
 
@@ -29,6 +34,9 @@ jobs:
       with:
         image: ${{ env.IMAGE_NAME }}
         tags: ${{ env.IMAGE_TAGS }}
+        build-args: |
+          FEDORA_MAJOR_VERSION=${{ matrix.major_version }}
+        oci: false
         containerfiles: |
           ./Containerfile
 
