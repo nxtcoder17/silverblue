@@ -7,7 +7,7 @@ ARG FEDORA_MAJOR_VERSION=39
 FROM quay.io/fedora-ostree-desktops/silverblue:${FEDORA_MAJOR_VERSION}
 # See https://pagure.io/releng/issue/11047 for final location
 
-# COPY rootfs/ /
+COPY rootfs/ /
 
 RUN rpm-ostree override remove firefox firefox-langpacks && \
   rpm-ostree update --uninstall rpmfusion-free-release --uninstall rpmfusion-nonfree-release --install rpmfusion-free-release --install rpmfusion-nonfree-release && \
