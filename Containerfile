@@ -11,8 +11,7 @@ COPY rootfs/ /
 
 # RUN rpm-ostree override remove firefox firefox-langpacks && \
 # RUN rpm-ostree update --uninstall rpmfusion-free-release --uninstall rpmfusion-nonfree-release --install rpmfusion-free-release --install rpmfusion-nonfree-release && \
-RUN rpm-ostree uninstall rpmfusion-free-release rpmfusion-nonfree-release && \
-  rpm-ostree install rpmfusion-free-release rpmfusion-nonfree-release && \
+RUN rpm-ostree install rpmfusion-free-release rpmfusion-nonfree-release && \
   rpm-ostree install gnome-tweaks distrobox akmod-nvidia xorg-x11-drv-nvidia-cuda && \
   rpm-ostree cleanup -m && \
   ostree container commit
