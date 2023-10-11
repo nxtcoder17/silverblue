@@ -15,7 +15,7 @@ RUN rpm-ostree install \
 
 RUN mkdir -p /var/lib && ln -s /usr/lib/alternatives /var/lib/alternatives
 
-COPY pkgs /tmp/pkgs
+# COPY pkgs /tmp/pkgs
 RUN rpm-ostree install gnome-tweaks distrobox akmod-nvidia xorg-x11-drv-nvidia-cuda
 
 RUN rpm-ostree kargs --append=rd.driver.blacklist=nouveau --append=modprobe.blacklist=nouveau --append=nvidia-drm.modeset=1 initcall_blacklist=simpledrm_platform_driver_init
