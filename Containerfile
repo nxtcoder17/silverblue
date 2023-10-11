@@ -10,8 +10,8 @@ FROM quay.io/fedora-ostree-desktops/silverblue:${FEDORA_MAJOR_VERSION}
 COPY rootfs/ /
 
 # RUN rpm-ostree override remove firefox firefox-langpacks && \
-RUN rpm-ostree update --uninstall rpmfusion-free-release --uninstall rpmfusion-nonfree-release --install rpmfusion-free-release --install rpmfusion-nonfree-release && \
-  rpm-ostree install gnome-tweaks distrobox akmod-nvidia xorg-x11-drv-nvidia-cuda && \
+# RUN rpm-ostree update --uninstall rpmfusion-free-release --uninstall rpmfusion-nonfree-release --install rpmfusion-free-release --install rpmfusion-nonfree-release && \
+RUN rpm-ostree install gnome-tweaks distrobox akmod-nvidia xorg-x11-drv-nvidia-cuda && \
   rpm-ostree cleanup -m && \
   ostree container commit
 # RUN rpm-ostree install gnome-tweaks && \
