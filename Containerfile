@@ -9,6 +9,7 @@ FROM quay.io/fedora-ostree-desktops/silverblue:${FEDORA_MAJOR_VERSION}
 
 
 # rpmfusion setup
+ENV FEDORA_MAJOR_VERSION=${FEDORA_MAJOR_VERSION}
 RUN rpm-ostree install \
   https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-${FEDORA_MAJOR_VERSION}.noarch.rpm \
   https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-${FEDORA_MAJOR_VERSION}.noarch.rpm
@@ -18,7 +19,7 @@ RUN mkdir -p /var/lib && ln -s /usr/lib/alternatives /var/lib/alternatives
 # COPY pkgs /tmp/pkgs
 RUN rpm-ostree install gnome-tweaks distrobox akmod-nvidia xorg-x11-drv-nvidia-cuda
 
-RUN rpm-ostree kargs --append=rd.driver.blacklist=nouveau --append=modprobe.blacklist=nouveau --append=nvidia-drm.modeset=1 initcall_blacklist=simpledrm_platform_driver_init
+# RUN rpm-ostree kargs --append=rd.driver.blacklist=nouveau --append=modprobe.blacklist=nouveau --append=nvidia-drm.modeset=1 initcall_blacklist=simpledrm_platform_driver_init
 # RUN rpm-ostree install $(cat /tmp/pkgs/base)
 # RUN rpm-ostree install $(cat /tmp/pkgs/virt)
 
