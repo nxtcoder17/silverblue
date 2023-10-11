@@ -9,10 +9,10 @@ FROM quay.io/fedora-ostree-desktops/silverblue:${FEDORA_MAJOR_VERSION}
 
 
 # rpmfusion setup
-ENV FEDORA_MAJOR_VERSION=${FEDORA_MAJOR_VERSION}
+# ENV FEDORA_MAJOR_VERSION=${FEDORA_MAJOR_VERSION}
 RUN rpm-ostree install \
-  https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-${FEDORA_MAJOR_VERSION}.noarch.rpm \
-  https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-${FEDORA_MAJOR_VERSION}.noarch.rpm
+  https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
+  https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
 
 RUN mkdir -p /var/lib && ln -s /usr/lib/alternatives /var/lib/alternatives
 
