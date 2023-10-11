@@ -11,7 +11,9 @@ COPY rootfs/ /
 
 RUN rpm-ostree override remove firefox firefox-langpacks && \
   rpm-ostree update --uninstall rpmfusion-free-release --uninstall rpmfusion-nonfree-release --install rpmfusion-free-release --install rpmfusion-nonfree-release && \
-  rpm-ostree install gnome-tweaks distrobox akmod-nvidia xorg-x11-drv-nvidia-cuda
+  rpm-ostree install gnome-tweaks distrobox akmod-nvidia xorg-x11-drv-nvidia-cuda && \
+  rpm-ostree cleanup -m && \
+  ostree container commit
 # RUN rpm-ostree install gnome-tweaks && \
 #   systemctl enable dconf-update.service && \
 #   rm -rf /usr/share/gnome-shell/extensions/background-logo@fedorahosted.org && \
