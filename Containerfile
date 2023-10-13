@@ -18,14 +18,14 @@ RUN rpm-ostree override remove firefox firefox-langpacks
 #   --uninstall rpmfusion-nonfree-release \
 #   --install rpmfusion-free-release \
 #   --install rpmfusion-nonfree-release
-RUN rpm-ostree install gnome-tweaks distrobox picom 
 
-RUN rpm-ostree kargs --append=rd.driver.blacklist=nouveau --append=modprobe.blacklist=nouveau --append=nvidia-drm.modeset=1 initcall_blacklist=simpledrm_platform_driver_init
+RUN rpm-ostree install gnome-tweaks distrobox picom \
+      akmod-nvidia xorg-x11-drv-nvidia-cuda xorg-x11-drv-nvidia-power asusctl supergfxctl
+
+# RUN rpm-ostree kargs --append=rd.driver.blacklist=nouveau --append=modprobe.blacklist=nouveau --append=nvidia-drm.modeset=1 initcall_blacklist=simpledrm_platform_driver_init
 
 RUN sed -i 's/#AutomaticUpdatePolicy.*/AutomaticUpdatePolicy=stage/' /etc/rpm-ostreed.conf && \
   systemctl enable rpm-ostreed-automatic.timer
-
-RUN rpm-ostree install akmod-nvidia xorg-x11-drv-nvidia-cuda xorg-x11-drv-nvidia-power asusctl supergfxctl
 
 RUN flatpak remove --all && \
   flatpak remote-delete fedora  && \
