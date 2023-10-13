@@ -19,8 +19,9 @@ RUN rpm-ostree override remove firefox firefox-langpacks
 #   --install rpmfusion-free-release \
 #   --install rpmfusion-nonfree-release
 
-RUN rpm-ostree install gnome-tweaks distrobox picom \
-      akmod-nvidia xorg-x11-drv-nvidia-cuda xorg-x11-drv-nvidia-power asusctl supergfxctl
+RUN rpm-ostree install gnome-tweaks distrobox picom docker \
+                        asusctl supergfxctl 
+# akmod-nvidia xorg-x11-drv-nvidia-cuda xorg-x11-drv-nvidia-power
 
 # RUN rpm-ostree kargs --append=rd.driver.blacklist=nouveau --append=modprobe.blacklist=nouveau --append=nvidia-drm.modeset=1 initcall_blacklist=simpledrm_platform_driver_init
 
