@@ -13,11 +13,11 @@ RUN rpm-ostree install \
 RUN mkdir -p /var/lib && ln -s /usr/lib/alternatives /var/lib/alternatives
 
 RUN rpm-ostree override remove firefox firefox-langpacks
-RUN rpm-ostree update \
-  --uninstall rpmfusion-free-release \
-  --uninstall rpmfusion-nonfree-release \
-  --install rpmfusion-free-release \
-  --install rpmfusion-nonfree-release
+# RUN rpm-ostree update \
+#   --uninstall rpmfusion-free-release \
+#   --uninstall rpmfusion-nonfree-release \
+#   --install rpmfusion-free-release \
+#   --install rpmfusion-nonfree-release
 RUN rpm-ostree install gnome-tweaks distrobox picom 
 
 RUN rpm-ostree kargs --append=rd.driver.blacklist=nouveau --append=modprobe.blacklist=nouveau --append=nvidia-drm.modeset=1 initcall_blacklist=simpledrm_platform_driver_init
