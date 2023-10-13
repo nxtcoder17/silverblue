@@ -27,9 +27,9 @@ RUN rpm-ostree install gnome-tweaks distrobox picom \
 RUN sed -i 's/#AutomaticUpdatePolicy.*/AutomaticUpdatePolicy=stage/' /etc/rpm-ostreed.conf && \
   systemctl enable rpm-ostreed-automatic.timer
 
-RUN flatpak remove --all && \
-  flatpak remote-delete fedora  && \
-  flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo && \
-  flatpak update
+# RUN flatpak remove --all && \
+#   flatpak remote-delete fedora  && \
+#   flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo && \
+#   flatpak update
 
 RUN rpm-ostree cleanup -m && ostree container commit
