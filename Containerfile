@@ -32,4 +32,6 @@ RUN sed -i 's/#AutomaticUpdatePolicy.*/AutomaticUpdatePolicy=stage/' /etc/rpm-os
 #   flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo && \
 #   flatpak update
 
+RUN rm -rf /var
+
 RUN rpm-ostree cleanup -m && ostree container commit
