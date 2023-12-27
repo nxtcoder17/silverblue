@@ -5,6 +5,6 @@ FROM ghcr.io/ublue-os/silverblue-asus-nvidia:${FEDORA_MAJOR_VERSION}
 ARG FEDORA_MAJOR_VERSION
 RUN sed -i "s,^PRETTY_NAME=.*,PRETTY_NAME=\"nxtcoder17's silverblue ${FEDORA_MAJOR_VERSION}\"," /usr/lib/os-release
 
-RUN rpm-ostree install kitty distrobox picom docker
+RUN rpm-ostree install kitty distrobox picom docker docker-compose
 
 RUN rpm-ostree cleanup -m && ostree container commit
