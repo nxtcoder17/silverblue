@@ -39,14 +39,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        major_version: [40,39]
+        major_version: [41]
         include:
-          - major_version: 40
+          - major_version: 41
             is_latest: true
             is_stable: true
-          - major_version: 39
-            is_latest: false
-            is_stable: false
+          # - major_version: 39
+          #   is_latest: false
+          #   is_stable: false
 
     steps:
       - name: Checkout repository
