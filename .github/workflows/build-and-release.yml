@@ -13,6 +13,7 @@ on:
       - '*.md'
       - '*.png'
       - '*.txt'
+
   push:
     branches:
       - master
@@ -21,6 +22,7 @@ on:
       - '*.md'
       - '*.png'
       - '*.txt'
+
   workflow_dispatch:
 
 env:
@@ -28,6 +30,7 @@ env:
   REGISTRY_URL: ghcr.io
   REGISTRY_USERNAME: ${{ github.repository_owner }}
   REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+
 
 jobs:
   build:
@@ -39,15 +42,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        major_version: [41]
-        include:
-          - major_version: 41
-            is_latest: true
-            is_stable: true
-          # - major_version: 39
-          #   is_latest: false
-          #   is_stable: false
-
+        fedora_version:
+          - 41
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -59,107 +55,40 @@ jobs:
           username: ${{ env.REGISTRY_USERNAME }}
           password: ${{ env.REGISTRY_PASSWORD }}
 
-      - name: Extract Docker metadata
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          images: |
-            ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_USERNAME }}/${{ env.IMAGE_NAME }}
-          flavor: |
-            latest=false
-          tags: |
-            type=semver,pattern={{version}}
-            type=sha,prefix=sha256-
-
-      - name: Extract Docker PR tag
-        if: github.event_name == 'pull_request'
-        id: meta_pr
-        uses: docker/metadata-action@v4
-        with:
-          images: |
-            ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_USERNAME }}/${{ env.IMAGE_NAME }}
-          flavor: |
-            latest=false
-          tags: |
-            type=ref,suffix=-${{ matrix.major_version }},event=pr
-
-      - name: Extract Docker date tag
-        if: github.event_name == 'schedule'
-        id: meta_date
-        uses: docker/metadata-action@v4
-        with:
-          images: |
-            ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_USERNAME }}/${{ env.IMAGE_NAME }}
-          flavor: |
-            latest=false
-          tags: |
-            type=schedule,prefix=${{ matrix.major_version }}-,pattern={{date 'YYYYMMDD'}}
-
-      - name: Extract Docker major version tag
-        if: |
-          github.event_name != 'pull_request' && matrix.major_version != ''
-        id: meta_version
-        uses: docker/metadata-action@v4
-        with:
-          images: |
-            ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_USERNAME }}/${{ env.IMAGE_NAME }}
-          flavor: |
-            latest=false
-          tags: |
-            type=raw,value=${{ matrix.major_version }}
-
-      - name: Extract Docker stable tag
-        if: |
-          github.event_name != 'pull_request' && matrix.is_stable == true
-        id: meta_stable
-        uses: docker/metadata-action@v4
-        with:
-          images: |
-            ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_USERNAME }}/${{ env.IMAGE_NAME }}
-          flavor: |
-            latest=false
-          tags: |
-            type=schedule,pattern={{date 'YYYYMMDD'}}
-            type=raw,value=stable
-
-      - name: Extract Docker latest tag
-        if: |
-          github.event_name != 'pull_request' && matrix.is_latest == true
-        id: meta_latest
-        uses: docker/metadata-action@v4
-        with:
-          images: |
-            ${{ env.REGISTRY_URL }}/${{ env.REGISTRY_USERNAME }}/${{ env.IMAGE_NAME }}
-          flavor: |
-            latest=false
-          tags: |
-            type=raw,value=latest
-
-      - name: Build Image
+      - name: Build Image with podman
         id: build_image
-        uses: redhat-actions/buildah-build@v2
-        with:
-          containerfiles: |
-            ./Containerfile
-          tags: |
-            ${{ steps.meta.outputs.tags }}
-            ${{ steps.meta_pr.outputs.tags }}
-            ${{ steps.meta_date.outputs.tags }}
-            ${{ steps.meta_version.outputs.tags }}
-            ${{ steps.meta_stable.outputs.tags }}
-            ${{ steps.meta_latest.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            FEDORA_MAJOR_VERSION=${{ matrix.major_version }}
-          oci: false
+        shell: bash
+        env:
+          IMAGE: "ghcr.io/${{ github.repository}}:${{matrix.fedora_version}}"
+        run: |+
+          podman build -t $IMAGE -f ./Containerfile . --build-arg FEDORA_VERSION=${{ matrix.fedora_version }}
+          podman push $IMAGE
 
-      - name: Push to container registries
-        uses: redhat-actions/push-to-registry@v2
-        id: push
-        with:
-          tags: ${{ steps.build_image.outputs.tags }}
-          extra-args: |
-            --disable-content-trust
+      # - name: Build Image
+      #   id: build_image
+      #   uses: redhat-actions/buildah-build@v2
+      #   with:
+      #     containerfiles: |
+      #       ./Containerfile
+      #     tags: |
+      #       ${{ steps.meta.outputs.tags }}
+      #       ${{ steps.meta_pr.outputs.tags }}
+      #       ${{ steps.meta_date.outputs.tags }}
+      #       ${{ steps.meta_version.outputs.tags }}
+      #       ${{ steps.meta_stable.outputs.tags }}
+      #       ${{ steps.meta_latest.outputs.tags }}
+      #     labels: ${{ steps.meta.outputs.labels }}
+      #     build-args: |
+      #       FEDORA_MAJOR_VERSION=${{ matrix.major_version }}
+      #     oci: false
+
+      # - name: Push to container registries
+      #   uses: redhat-actions/push-to-registry@v2
+      #   id: push
+      #   with:
+      #     tags: ${{ steps.build_image.outputs.tags }}
+      #     extra-args: |
+      #       --disable-content-trust
 
       # - name: Install Cosign
       #   uses: sigstore/cosign-installer@v3.1.2
@@ -174,4 +103,4 @@ jobs:
 
       - name: Echo outputs
         run: |
-          echo "${{ toJSON(steps.push.outputs) }}"
+          echo "IMAGE: ghcr.io/${{ github.repository}}:${{matrix.fedora_version}}"
