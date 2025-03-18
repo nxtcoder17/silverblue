@@ -7,5 +7,5 @@ RUN sed -i "s|^PRETTY_NAME=.*|PRETTY_NAME=nxtcoder17 edition silverblue ${FEDORA
 
 RUN rpm-ostree override remove firefox firefox-langpacks
 RUN rpm-ostree install kitty distrobox docker wayfire hyprland \
-  xorg-x11-xauth xorg-x11-xinit gnome-session-xsession
+  xorg-x11-xauth xorg-x11-xinit gnome-session-xsession i3
 RUN rpm-ostree cleanup -m && ostree container commit
