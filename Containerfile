@@ -17,13 +17,12 @@ ARG NVIDIA_AKMODS_DIGEST=""
 
 # Stage 1: Clone ublue-os/main and merge packages
 FROM alpine/git AS buildctx
-ARG UBLUE_MAIN_VERSION="main"
-
 RUN apk add --no-cache yq jq
 
 RUN <<EOF
-  echo "Cloning ublue-os/main repo (branch: $UBLUE_MAIN_VERSION)..."
-  git clone --depth=1 --branch "${UBLUE_MAIN_VERSION}" \
+  git_branch="main"
+  echo "Cloning ublue-os/main repo (branch: $git_branch)..."
+  git clone --depth=1 --branch "${git_branch}" \
     https://github.com/ublue-os/main.git ./ublue-os
   mv ublue-os/sys_files /
   mv ublue-os/build_files/* /
@@ -36,23 +35,15 @@ RUN <<EOF
   set -ex
   echo "Merging ublue packages with custom packages..."
 
-  # Extract ublue packages for "all" and "silverblue" sections
-  UBLUE_ALL=$(jq -r '.all.include.all[]' /ublue-packages.json)
-  UBLUE_SILVERBLUE=$(jq -r '.all.include.silverblue[]' /ublue-packages.json)
-
   # Convert your YAML packages to JSON array
-  YOUR_PACKAGES=$(yq -o=json '.packages' /packages.yml)
+  yq -o=json /packages.yml > /additional-packages.json
 
-  # Merge all three lists, deduplicate and sort
-  jq -n \
-    --arg ublue_all "$UBLUE_ALL" \
-    --arg ublue_sb "$UBLUE_SILVERBLUE" \
-    --argjson yours "$YOUR_PACKAGES" \
-    '{"packages": (($ublue_all | split("\n")) + ($ublue_sb | split("\n")) + $yours | unique | sort)}' \
-    > /packages.json
+  jq --slurpfile pkgs /additional-packages.json \
+   '.all.include.silverblue += $pkgs[0].packages' \
+   /ublue-packages.json > /packages.json
 
-  echo "Final package list ($(jq -r '.packages | length' /packages.json) packages):"
-  jq -r '.packages[]' /packages.json
+  echo "also installing user packages"
+  jq -r '.all.include.silverblue' </packages.json
 EOF
 
 # Stage 2: Get kernel modules from ublue-os
@@ -82,16 +73,19 @@ set -ouex pipefail
 rm -f /usr/bin/chsh /usr/bin/lchsh
 
 echo "Running ublue-os build scripts..."
-
 /ctx/install.sh
 
 AKMODNV_PATH=/tmp/akmods-nv-rpms /ctx/nvidia-install.sh
 
 /ctx/initramfs.sh
 /ctx/post-install.sh
-
 EOF
 
 # Validate the image
 RUN ["bootc", "container", "lint"]
 
+# RUN rpm-ostree override remove firefox firefox-langpacks
+# RUN rpm-ostree cleanup -m
+#
+# RUN sed -i "s|^NAME=.*|NAME=nxtcoder17 edition silverblue ${FEDORA_VERSION}|" /usr/lib/os-release
+# RUN sed -i "s|^PRETTY_NAME=.*|PRETTY_NAME=nxtcoder17 edition silverblue ${FEDORA_VERSION}|" /usr/lib/os-release
