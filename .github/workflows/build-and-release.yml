@@ -48,21 +48,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Log into registry
-        uses: docker/login-action@v2
+      - name: Set up Docker
+        uses: docker/setup-docker-action@v4
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY_URL }}
           username: ${{ env.REGISTRY_USERNAME }}
           password: ${{ env.REGISTRY_PASSWORD }}
 
-      - name: Build Image with podman
+      - name: Build Image
         id: build_image
         shell: bash
         env:
           IMAGE: "ghcr.io/${{ github.repository}}:${{matrix.fedora_version}}"
         run: |+
-          podman build -t $IMAGE -f ./Containerfile . --build-arg FEDORA_VERSION=${{ matrix.fedora_version }}
-          podman push $IMAGE
+          docker build -t $IMAGE -f ./Containerfile . --build-arg FEDORA_VERSION=${{ matrix.fedora_version }}
+          docker push $IMAGE
 
       # - name: Build Image
       #   id: build_image
